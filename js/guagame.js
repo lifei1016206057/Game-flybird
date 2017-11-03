@@ -13,7 +13,12 @@ class GuaGame {
         this.stop = false
         this.elements = []              //没有动画的元素
         this.elementsAnimation = []     //有动画的元素
-
+        this.images = []                //保存加载的
+        this.imagePath = {              //保存图片位置
+            bird: "img/birds.png",
+            land: "img/land.png",
+            sky: "img/sky.png", 
+        }
               //当点击按键的时候,存储状态;
         window.addEventListener("keydown", (event) => {
             this.keydowns[event.key] = true;    //按下按键,存储状态;
@@ -123,9 +128,36 @@ class GuaGame {
                 setfps();
             }, 1000/Const.fps)
         }
-        setTimeout(function() {
-            setfps();
-        }, 1000/Const.fps)
+
+        let run = function() {
+            setTimeout(function() {
+                setfps();
+            }, 1000/Const.fps)
+        }
+        run()
+
+        var loadImage = new Promise( (resolve, reject) => {
+            var images = Object.keys(this.imagePath)
+            images.forEach((v, i) => {
+                let img = new Image()
+                img.src = this.imagePath[v]
+                img.onload = function() {
+                    resolve({images: images, img: img})
+                }
+            })
+        })
+        var self = this
+        loadImage.then( (data) => {
+            
+            log(data)
+            log(self.images)
+            self.images.push(data.img)
+            if (self.images.length === data.images) {
+                log("加载完成")
+                run()
+            }
+        })
+        
     }
 
 }
